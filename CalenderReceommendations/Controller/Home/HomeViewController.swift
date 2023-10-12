@@ -22,6 +22,7 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
         requestAccessToCalendar()
         // Subscribe to notifications to reload the UI when
         subscribeToNotifications()
+        callWeather()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -39,6 +40,22 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
                 self.initializeStore()
                 self.subscribeToNotifications()
                 self.reloadData()
+            }
+        }
+    }
+    
+    private func callWeather() {
+        
+        let weatherService = WeatherService()
+        let latitude = "17.513053874061285"
+        let longitude = "78.54543492665518"
+        weatherService.fetchWeatherData(latitude: latitude, longitude: longitude) { result in
+            switch result {
+            case .success(let weatherResponse):
+                // Handle the weather response here
+                print(weatherResponse.hourly[0].dt, weatherResponse.hourly[0].temp)
+            case .failure(let error):
+                print("Error: \(error)")
             }
         }
     }
