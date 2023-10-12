@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41810DC02AD81D9600F548B4 /* EventDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DBF2AD81D9600F548B4 /* EventDetailsViewController.swift */; };
+		41810DC22AD86E4300F548B4 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DC12AD86E4300F548B4 /* Extensions.swift */; };
+		41810DC52AD8726E00F548B4 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DC42AD8726E00F548B4 /* AlertController.swift */; };
 		41AD3ADB2AD70BAB00D17047 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADA2AD70BAB00D17047 /* WeatherManager.swift */; };
 		41AD3ADD2AD7231300D17047 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADC2AD7231300D17047 /* Weather.swift */; };
 		41AD3ADF2AD7235E00D17047 /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADE2AD7235E00D17047 /* WeatherModel.swift */; };
@@ -44,6 +47,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		41810DBF2AD81D9600F548B4 /* EventDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailsViewController.swift; sourceTree = "<group>"; };
+		41810DC12AD86E4300F548B4 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		41810DC42AD8726E00F548B4 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
 		41AD3ADA2AD70BAB00D17047 /* WeatherManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherManager.swift; sourceTree = "<group>"; };
 		41AD3ADC2AD7231300D17047 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		41AD3ADE2AD7235E00D17047 /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModel.swift; sourceTree = "<group>"; };
@@ -92,6 +98,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		41810DBE2AD81D7800F548B4 /* EventDetails */ = {
+			isa = PBXGroup;
+			children = (
+				41810DBF2AD81D9600F548B4 /* EventDetailsViewController.swift */,
+			);
+			path = EventDetails;
+			sourceTree = "<group>";
+		};
+		41810DC32AD8726300F548B4 /* Resuable */ = {
+			isa = PBXGroup;
+			children = (
+				41810DC42AD8726E00F548B4 /* AlertController.swift */,
+			);
+			path = Resuable;
+			sourceTree = "<group>";
+		};
 		41AD3AE02AD7237E00D17047 /* WeatherViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,6 +221,7 @@
 		41F594862AD548DE001646AA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				41810DBE2AD81D7800F548B4 /* EventDetails */,
 				41AD3AE02AD7237E00D17047 /* WeatherViewController */,
 				41F594912AD54B64001646AA /* Home */,
 			);
@@ -208,6 +231,7 @@
 		41F594872AD548E7001646AA /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				41810DC32AD8726300F548B4 /* Resuable */,
 				41F594882AD548FD001646AA /* Extensions */,
 				41F594892AD54918001646AA /* LocationHandler.swift */,
 			);
@@ -217,6 +241,7 @@
 		41F594882AD548FD001646AA /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				41810DC12AD86E4300F548B4 /* Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -367,12 +392,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41810DC52AD8726E00F548B4 /* AlertController.swift in Sources */,
 				41AD3ADD2AD7231300D17047 /* Weather.swift in Sources */,
 				41AD3AE22AD7239100D17047 /* WeatherViewController.swift in Sources */,
 				41AD3ADF2AD7235E00D17047 /* WeatherModel.swift in Sources */,
 				41F594582AD54894001646AA /* HomeViewController.swift in Sources */,
 				41F594542AD54894001646AA /* AppDelegate.swift in Sources */,
+				41810DC02AD81D9600F548B4 /* EventDetailsViewController.swift in Sources */,
 				41F594562AD54894001646AA /* SceneDelegate.swift in Sources */,
+				41810DC22AD86E4300F548B4 /* Extensions.swift in Sources */,
 				41F5948A2AD54918001646AA /* LocationHandler.swift in Sources */,
 				41ED743F2AD6D61E00B31C88 /* EventWrapper.swift in Sources */,
 				41E9B65A2AD5586A00D1158C /* Event.swift in Sources */,
