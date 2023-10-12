@@ -17,6 +17,7 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Calendar"
+        self.view.backgroundColor = .white
         // The app must have access to the user's calendar to show the events on the timeline
         requestAccessToCalendar()
         // Subscribe to notifications to reload the UI when
