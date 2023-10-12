@@ -16,14 +16,14 @@ class EventDetailsViewController: UIViewController {
         let label = UILabel(frame: .zero)
         label.font = UIFont.boldSystemFont(ofSize: 20)
         label.numberOfLines = 0
-        label.textAlignment = .center
+        label.textAlignment = .left
         return label
     }()
     
     private let startDateLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 14)
-        label.textAlignment = .center
+        label.textAlignment = .left
         label.text = "Start Time: "
         return label
     }()
@@ -31,14 +31,14 @@ class EventDetailsViewController: UIViewController {
     private let startDate: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.boldSystemFont(ofSize: 14)
-        label.textAlignment = .center
+        label.textAlignment = .left
         return label
     }()
     
     private let endDateLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 14)
-        label.textAlignment = .center
+        label.textAlignment = .left
         label.text = "End Time: "
         return label
     }()
@@ -46,7 +46,7 @@ class EventDetailsViewController: UIViewController {
     private let endDate: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.boldSystemFont(ofSize: 14)
-        label.textAlignment = .center
+        label.textAlignment = .left
         return label
     }()
     
@@ -57,8 +57,17 @@ class EventDetailsViewController: UIViewController {
         return button
     }()
     
+    private let gptLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.numberOfLines = 0
+        label.textAlignment = .left
+        return label
+    }()
+    
     private let event: EKEvent
     private let eventStore: EKEventStore
+    private var locationName: String = ""
     
     required init(event: EKEvent, eventStore: EKEventStore) {
         self.event = event
@@ -84,7 +93,7 @@ class EventDetailsViewController: UIViewController {
         self.view.addSubview(header)
         header.topToSuperview(offset: 120)
         header.leftToSuperview(offset: 35)
-        header.height(46)
+        header.height(84)
         header.widthToSuperview(multiplier: 0.7)
         
         self.view.addSubview(startDateLabel)
@@ -122,31 +131,99 @@ class EventDetailsViewController: UIViewController {
         let timedifference = self.calculateHoursAndMinutes(startDate: event.startDate, endDate: event.endDate)
         var time = "(\(timedifference.hours)h \(timedifference.minutes) min)"
         if timedifference.minutes == 0 {
-           time = "(\(timedifference.hours)hour)"
+            time = "(\(timedifference.hours)hour)"
         } else if timedifference.hours == 0 {
             time = "(\(timedifference.minutes) min)"
         }
-    
+        
         header.attributedText = self.attributedText(mainText: event.title + time, eventName: event.title, timeDiff: time)
         startDate.text = event.startDate.convertToTime()
         endDate.text = event.endDate.convertToTime()
         
-        guard let lat = event.structuredLocation?.geoLocation?.coordinate.latitude else {
-            return
+        self.getWeather()
+    }
+    
+    func getWeather() {
+        if let lat = event.structuredLocation?.geoLocation?.coordinate.latitude, let lon = event.structuredLocation?.geoLocation?.coordinate.longitude  {
+            self.reverseGeocoding(lat: lat, lon: lon)
+        } else {
+            // No location added to event. User's current location will be used to fetch weather data
+            let locationManager = CLLocationManager()
+            locationManager.delegate = self
+            locationManager.requestWhenInUseAuthorization()
+            locationManager.requestLocation()
         }
-        guard let lon = event.structuredLocation?.geoLocation?.coordinate.longitude else {
-            return
-        }
+    }
+    
+    func fetchWeather(lat: Double, lon: Double) {
         
         let weatherService = WeatherService()
         weatherService.fetchWeatherData(latitude: "\(lat)", longitude: "\(lon)") { result in
             switch result {
             case .success(let weatherResponse):
                 // Handle the weather response here
-                print(weatherResponse.hourly[0].dt, weatherResponse.hourly[0].temp)
+                let eventStartTime = Int(self.event.startDate.timeIntervalSince1970)
+                let eventEndTime = Int(self.event.endDate.timeIntervalSince1970)
+                let hourlyData = weatherResponse.hourly.map { $0.dt }
+                let closestTimeStampStart = hourlyData.min(by: { abs($0 - eventStartTime) < abs($1 - eventStartTime) })
+                let closestTimeStampEnd = hourlyData.min(by: { abs($0 - eventEndTime) < abs($1 - eventEndTime) })
+                let startIndex = weatherResponse.hourly.firstIndex{ $0.dt == closestTimeStampStart } ?? 0
+                let endIndex = weatherResponse.hourly.firstIndex{ $0.dt == closestTimeStampEnd } ?? 1
+                let start = weatherResponse.hourly[startIndex]
+                let end = weatherResponse.hourly[endIndex]
+                self.gptRecommendation(startWeather: start, endWeather: end)
             case .failure(let error):
                 print("Error: \(error)")
             }
+        }
+        
+        
+    }
+    
+    func reverseGeocoding (lat: Double, lon: Double) {
+        
+        let locationManager = LocationManager()
+        
+        locationManager.reverseGeocode(latitude: lat, longitude: lon) { address, city, state, postalCode, country in
+            if let address = address, let city = city, let state = state, let postalCode = postalCode, let country = country {
+                print("Address: \(address)")
+                print("City: \(city)")
+                print("State: \(state)")
+                print("Postal Code: \(postalCode)")
+                print("Country: \(country)")
+                self.locationName = "\(address) \(city) \(state) \(postalCode) \(country)"
+                self.fetchWeather(lat: lat, lon: lon)
+            } else {
+                print("Reverse geocoding failed.")
+            }
+        }
+    }
+    
+    func gptRecommendation(startWeather: HourlyData, endWeather: HourlyData) {
+        
+        let gpt = GPTService()
+        gpt.getResponse(event: self.event, startWeather: startWeather, endWeather: endWeather, locationName: locationName) { response, error in
+            if error != nil {
+                print(error?.localizedDescription)
+            } else {
+                print(response)
+                guard let response = response else {
+                    return
+                }
+                self.addGPTText(response: response)
+            }
+        }
+    }
+    
+    func addGPTText(response: String) {
+        
+        DispatchQueue.main.async {
+            self.view.addSubview(self.gptLabel)
+            self.gptLabel.topToBottom(of: self.endDateLabel, offset: 30)
+            self.gptLabel.widthToSuperview(multiplier: 0.9)
+            self.gptLabel.height(300)
+            self.gptLabel.centerXToSuperview()
+            self.gptLabel.text = response
         }
     }
     
@@ -193,5 +270,19 @@ extension EventDetailsViewController {
         attributedText.addAttribute(.font, value: UIFont.systemFont(ofSize: 20), range: lightRange)
         attributedText.addAttribute(.foregroundColor, value: UIColor.gray, range: lightRange)
         return attributedText
+    }
+}
+
+extension EventDetailsViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            // Use the current location
+            self.reverseGeocoding(lat: location.coordinate.latitude, lon: location.coordinate.longitude)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        // Handle location error
+        print("Location error: \(error)")
     }
 }

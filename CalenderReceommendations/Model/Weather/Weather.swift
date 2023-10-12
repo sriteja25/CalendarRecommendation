@@ -61,4 +61,5 @@ struct HourlyData: Decodable {
     let dt: Int
     let temp: Double
     let feels_like: Double
+    let weather: [WeatherInfo]
 }

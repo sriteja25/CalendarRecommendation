@@ -10,7 +10,10 @@
 		41810DC02AD81D9600F548B4 /* EventDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DBF2AD81D9600F548B4 /* EventDetailsViewController.swift */; };
 		41810DC22AD86E4300F548B4 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DC12AD86E4300F548B4 /* Extensions.swift */; };
 		41810DC52AD8726E00F548B4 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DC42AD8726E00F548B4 /* AlertController.swift */; };
-		41AD3ADB2AD70BAB00D17047 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADA2AD70BAB00D17047 /* WeatherManager.swift */; };
+		41810DC72AD87CE300F548B4 /* GPTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DC62AD87CE300F548B4 /* GPTService.swift */; };
+		41810DC92AD8801700F548B4 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810DC82AD8801700F548B4 /* LocationManager.swift */; };
+		41810DCC2AD889CD00F548B4 /* ChatGPTSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 41810DCB2AD889CD00F548B4 /* ChatGPTSwift */; };
+		41AD3ADB2AD70BAB00D17047 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADA2AD70BAB00D17047 /* WeatherService.swift */; };
 		41AD3ADD2AD7231300D17047 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADC2AD7231300D17047 /* Weather.swift */; };
 		41AD3ADF2AD7235E00D17047 /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3ADE2AD7235E00D17047 /* WeatherModel.swift */; };
 		41AD3AE22AD7239100D17047 /* WeatherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3AE12AD7239100D17047 /* WeatherViewController.swift */; };
@@ -50,7 +53,9 @@
 		41810DBF2AD81D9600F548B4 /* EventDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailsViewController.swift; sourceTree = "<group>"; };
 		41810DC12AD86E4300F548B4 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		41810DC42AD8726E00F548B4 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
-		41AD3ADA2AD70BAB00D17047 /* WeatherManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherManager.swift; sourceTree = "<group>"; };
+		41810DC62AD87CE300F548B4 /* GPTService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPTService.swift; sourceTree = "<group>"; };
+		41810DC82AD8801700F548B4 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		41AD3ADA2AD70BAB00D17047 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		41AD3ADC2AD7231300D17047 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		41AD3ADE2AD7235E00D17047 /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModel.swift; sourceTree = "<group>"; };
 		41AD3AE12AD7239100D17047 /* WeatherViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewController.swift; sourceTree = "<group>"; };
@@ -77,6 +82,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				41F5948D2AD5496F001646AA /* TinyConstraints in Frameworks */,
+				41810DCC2AD889CD00F548B4 /* ChatGPTSwift in Frameworks */,
 				41F594902AD5497C001646AA /* CalendarKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -213,7 +219,9 @@
 		41F594852AD548B5001646AA /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				41AD3ADA2AD70BAB00D17047 /* WeatherManager.swift */,
+				41AD3ADA2AD70BAB00D17047 /* WeatherService.swift */,
+				41810DC62AD87CE300F548B4 /* GPTService.swift */,
+				41810DC82AD8801700F548B4 /* LocationManager.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -273,6 +281,7 @@
 			packageProductDependencies = (
 				41F5948C2AD5496F001646AA /* TinyConstraints */,
 				41F5948F2AD5497C001646AA /* CalendarKit */,
+				41810DCB2AD889CD00F548B4 /* ChatGPTSwift */,
 			);
 			productName = CalenderReceommendations;
 			productReference = 41F594502AD54894001646AA /* CalenderReceommendations.app */;
@@ -349,6 +358,7 @@
 			packageReferences = (
 				41F5948B2AD5496F001646AA /* XCRemoteSwiftPackageReference "TinyConstraints" */,
 				41F5948E2AD5497C001646AA /* XCRemoteSwiftPackageReference "CalendarKit" */,
+				41810DCA2AD889CD00F548B4 /* XCRemoteSwiftPackageReference "ChatGPTSwift" */,
 			);
 			productRefGroup = 41F594512AD54894001646AA /* Products */;
 			projectDirPath = "";
@@ -399,12 +409,14 @@
 				41F594582AD54894001646AA /* HomeViewController.swift in Sources */,
 				41F594542AD54894001646AA /* AppDelegate.swift in Sources */,
 				41810DC02AD81D9600F548B4 /* EventDetailsViewController.swift in Sources */,
+				41810DC92AD8801700F548B4 /* LocationManager.swift in Sources */,
+				41810DC72AD87CE300F548B4 /* GPTService.swift in Sources */,
 				41F594562AD54894001646AA /* SceneDelegate.swift in Sources */,
 				41810DC22AD86E4300F548B4 /* Extensions.swift in Sources */,
 				41F5948A2AD54918001646AA /* LocationHandler.swift in Sources */,
 				41ED743F2AD6D61E00B31C88 /* EventWrapper.swift in Sources */,
 				41E9B65A2AD5586A00D1158C /* Event.swift in Sources */,
-				41AD3ADB2AD70BAB00D17047 /* WeatherManager.swift in Sources */,
+				41AD3ADB2AD70BAB00D17047 /* WeatherService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -751,6 +763,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		41810DCA2AD889CD00F548B4 /* XCRemoteSwiftPackageReference "ChatGPTSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alfianlosari/ChatGPTSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.0;
+			};
+		};
 		41F5948B2AD5496F001646AA /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roberthein/TinyConstraints.git";
@@ -770,6 +790,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		41810DCB2AD889CD00F548B4 /* ChatGPTSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 41810DCA2AD889CD00F548B4 /* XCRemoteSwiftPackageReference "ChatGPTSwift" */;
+			productName = ChatGPTSwift;
+		};
 		41F5948C2AD5496F001646AA /* TinyConstraints */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 41F5948B2AD5496F001646AA /* XCRemoteSwiftPackageReference "TinyConstraints" */;
