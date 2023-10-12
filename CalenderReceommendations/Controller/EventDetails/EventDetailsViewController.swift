@@ -59,6 +59,15 @@ class EventDetailsViewController: UIViewController {
     
     private let gptLabel: UILabel = {
         let label = UILabel(frame: .zero)
+        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.text = "Based on weather and location"
+        return label
+    }()
+    
+    private let gptValue: UILabel = {
+        let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -221,9 +230,14 @@ class EventDetailsViewController: UIViewController {
             self.view.addSubview(self.gptLabel)
             self.gptLabel.topToBottom(of: self.endDateLabel, offset: 30)
             self.gptLabel.widthToSuperview(multiplier: 0.9)
-            self.gptLabel.height(300)
+            self.gptLabel.height(40)
             self.gptLabel.centerXToSuperview()
-            self.gptLabel.text = response
+            self.view.addSubview(self.gptValue)
+            self.gptValue.topToBottom(of: self.gptLabel, offset: 15)
+            self.gptValue.widthToSuperview(multiplier: 0.9)
+            self.gptValue.height(300)
+            self.gptValue.centerXToSuperview()
+            self.gptValue.text = response
         }
     }
     
