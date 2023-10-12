@@ -14,8 +14,17 @@ class EventDetailsViewController: UIViewController {
     
     private let header: UILabel = {
         let label = UILabel(frame: .zero)
-        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.numberOfLines = 0
         label.textAlignment = .center
+        return label
+    }()
+    
+    private let startDateLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.text = "Start Time: "
         return label
     }()
     
@@ -23,6 +32,14 @@ class EventDetailsViewController: UIViewController {
         let label = UILabel(frame: .zero)
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textAlignment = .center
+        return label
+    }()
+    
+    private let endDateLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.text = "End Time: "
         return label
     }()
     
@@ -36,7 +53,7 @@ class EventDetailsViewController: UIViewController {
     private let deleteButton: UIButton = {
         let button = UIButton(frame: .zero)
         button.setTitle("Delete Event", for: .normal)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.red, for: .normal)
         return button
     }()
     
@@ -66,31 +83,51 @@ class EventDetailsViewController: UIViewController {
         self.view.backgroundColor = .white
         self.view.addSubview(header)
         header.topToSuperview(offset: 120)
-        header.centerXToSuperview()
-        header.widthToSuperview()
+        header.leftToSuperview(offset: 35)
+        header.height(46)
+        header.widthToSuperview(multiplier: 0.7)
+        
+        self.view.addSubview(startDateLabel)
+        self.view.addSubview(endDateLabel)
+        startDateLabel.topToBottom(of: header, offset: 30)
+        endDateLabel.topToBottom(of: startDateLabel, offset: 30)
+        startDateLabel.width(75)
+        endDateLabel.width(75)
+        startDateLabel.height(20)
+        endDateLabel.height(20)
+        startDateLabel.leftToSuperview(offset: 35)
+        endDateLabel.leftToSuperview(offset: 35)
         
         self.view.addSubview(startDate)
         self.view.addSubview(endDate)
         startDate.topToBottom(of: header, offset: 30)
         endDate.topToBottom(of: startDate, offset: 30)
-        startDate.widthToSuperview()
-        endDate.widthToSuperview()
+        startDate.width(75)
+        endDate.width(75)
         startDate.height(20)
         endDate.height(20)
+        startDate.leftToRight(of: startDateLabel, offset: 10)
+        endDate.leftToRight(of: endDateLabel, offset: 10)
         
         self.view.addSubview(deleteButton)
         deleteButton.bottomToSuperview(offset: -30)
         deleteButton.widthToSuperview()
         deleteButton.height(40)
         deleteButton.addTarget(self, action: #selector(deleteTapped), for: .touchUpInside)
-        
-        
         self.setValues()
     }
     
     func setValues() {
         
-        header.text = "Event Name: " + event.title
+        let timedifference = self.calculateHoursAndMinutes(startDate: event.startDate, endDate: event.endDate)
+        var time = "(\(timedifference.hours)h \(timedifference.minutes) min)"
+        if timedifference.minutes == 0 {
+           time = "(\(timedifference.hours)hour)"
+        } else if timedifference.hours == 0 {
+            time = "(\(timedifference.minutes) min)"
+        }
+    
+        header.attributedText = self.attributedText(mainText: event.title + time, eventName: event.title, timeDiff: time)
         startDate.text = event.startDate.convertToTime()
         endDate.text = event.endDate.convertToTime()
         
@@ -130,5 +167,31 @@ class EventDetailsViewController: UIViewController {
         
         let cancel = UIAlertAction(title: "Cancel", style: .cancel)
         AlertManager.showAlertWithActions(title: "Confirm?", message: "Event will be permanently deleted", viewController: self, actions: [delete, cancel], completion: nil)
+    }
+}
+
+extension EventDetailsViewController {
+    
+    func calculateHoursAndMinutes(startDate: Date, endDate: Date) -> (hours: Int, minutes: Int) {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: startDate, to: endDate)
+        
+        if let hours = components.hour, let minutes = components.minute {
+            return (hours, minutes)
+        } else {
+            return (0, 0)
+        }
+    }
+    
+    func attributedText(mainText: String, eventName: String, timeDiff: String) -> NSMutableAttributedString {
+        
+        let attributedText = NSMutableAttributedString(string: mainText)
+        let boldRange = (mainText as NSString).range(of: eventName)
+        let lightRange = (mainText as NSString).range(of: timeDiff)
+        attributedText.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: 22), range: boldRange)
+        attributedText.addAttribute(.foregroundColor, value: UIColor.black, range: boldRange)
+        attributedText.addAttribute(.font, value: UIFont.systemFont(ofSize: 20), range: lightRange)
+        attributedText.addAttribute(.foregroundColor, value: UIColor.gray, range: lightRange)
+        return attributedText
     }
 }
