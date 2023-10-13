@@ -7,6 +7,7 @@
 
 import EventKit
 import EventKitUI
+import MapKit
 import MBProgressHUD
 import TinyConstraints
 import UIKit
@@ -51,6 +52,13 @@ class EventDetailsViewController: UIViewController {
         return label
     }()
     
+    private let mapView: MKMapView = {
+        let mapView = MKMapView(frame: .zero)
+        mapView.mapType = .standard
+        mapView.showsUserLocation = true
+        return mapView
+    }()
+    
     private let deleteButton: UIButton = {
         let button = UIButton(frame: .zero)
         button.setTitle("🗑️ Delete Event", for: .normal)
@@ -80,6 +88,8 @@ class EventDetailsViewController: UIViewController {
     private let eventStore: EKEventStore
     private var locationName: String = ""
     private var hud = MBProgressHUD()
+    private var lat:Double = 0
+    private var lon:Double = 0
     
     required init(event: EKEvent, eventStore: EKEventStore) {
         self.event = event
@@ -103,15 +113,15 @@ class EventDetailsViewController: UIViewController {
     private func setupUI() {
         self.view.backgroundColor = .white
         self.view.addSubview(header)
-        header.topToSuperview(offset: 120)
+        header.topToSuperview(offset: 90)
         header.leftToSuperview(offset: 35)
         header.height(84)
         header.widthToSuperview(multiplier: 0.7)
         
         self.view.addSubview(startDateLabel)
         self.view.addSubview(endDateLabel)
-        startDateLabel.topToBottom(of: header, offset: 30)
-        endDateLabel.topToBottom(of: startDateLabel, offset: 30)
+        startDateLabel.topToBottom(of: header, offset: 15)
+        endDateLabel.topToBottom(of: startDateLabel, offset: 15)
         startDateLabel.width(100)
         endDateLabel.width(100)
         startDateLabel.height(20)
@@ -121,8 +131,8 @@ class EventDetailsViewController: UIViewController {
         
         self.view.addSubview(startDate)
         self.view.addSubview(endDate)
-        startDate.topToBottom(of: header, offset: 30)
-        endDate.topToBottom(of: startDate, offset: 30)
+        startDate.topToBottom(of: header, offset: 15)
+        endDate.topToBottom(of: startDate, offset: 15)
         startDate.width(75)
         endDate.width(75)
         startDate.height(20)
@@ -135,6 +145,14 @@ class EventDetailsViewController: UIViewController {
         deleteButton.widthToSuperview()
         deleteButton.height(40)
         deleteButton.addTarget(self, action: #selector(deleteTapped), for: .touchUpInside)
+        
+        self.view.addSubview(mapView)
+        mapView.height(75)
+        mapView.widthToSuperview()
+        mapView.bottomToTop(of: deleteButton, offset: -20)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        mapView.addGestureRecognizer(tapGesture)
         
         self.view.addSubview(self.gptLabel)
         self.gptLabel.topToBottom(of: self.endDateLabel, offset: 45)
@@ -188,8 +206,35 @@ class EventDetailsViewController: UIViewController {
         }
     }
     
-    func fetchWeather(lat: Double, lon: Double) {
+    func showMap(lat: Double, lon: Double) {
+        DispatchQueue.main.async {
+            self.lat = lat
+            self.lon = lon
+            let placeTitle = self.event.title ?? "Event place"
+            LocationManager().loadPlaceOnMap(latitude: lat, longitude: lon, title: placeTitle, subtitle: "", mapView: self.mapView)
+        }
+    }
+    
+    @objc 
+    func handleTap(_ gesture: UITapGestureRecognizer) {
         
+        let placeTitle = self.event.title ?? "Event place"
+        let locationManager = LocationManager()
+        let controller = UIAlertController(title: "Choose", message: "Select preferred maps to view the event location", preferredStyle: .actionSheet)
+        controller.addAction(UIAlertAction(title: "Apple Maps", style: .default, handler: { _ in
+            locationManager.openLocationInAppleMaps(latitude: self.lat, longitude: self.lon, placeName: placeTitle)
+        }))
+        controller.addAction(UIAlertAction(title: "Google Maps", style: .default, handler: { _ in
+            locationManager.openLocationInGoogleMaps(latitude: self.lat, longitude: self.lon, placeName: placeTitle)
+        }))
+        controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+            controller.dismiss(animated: true)
+        }))
+        self.navigationController?.present(controller, animated: true)
+    }
+    
+    func fetchWeather(lat: Double, lon: Double) {
+        self.showMap(lat: lat, lon: lon)
         let weatherService = WeatherService()
         weatherService.fetchWeatherData(latitude: "\(lat)", longitude: "\(lon)") { result in
             switch result {
