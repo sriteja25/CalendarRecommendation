@@ -38,4 +38,60 @@ final class CalenderReceommendationsUITests: XCTestCase {
             }
         }
     }
+    
+    func testCalendarInteraction() throws {
+        let app = XCUIApplication()
+        app.launch() // Launch your app
+        
+        // Will fail because map view is hidden till an event is selected
+        let mapView = app.maps["Calendar"]
+        XCTAssertTrue(mapView.waitForExistence(timeout: 10), "MKMapView not found")
+        
+        // Tap on the MKMapView to trigger the tap gesture
+        mapView.tap()
+        
+        // Wait for the alert controller to appear
+        let alert = app.alerts.element
+        XCTAssertTrue(alert.waitForExistence(timeout: 5), "Alert controller not displayed")
+        
+        // Verify the alert controller's buttons
+        let appleMapsButton = alert.buttons["Apple Maps"]
+        let googleMapsButton = alert.buttons["Google Maps"]
+        let cancelButton = alert.buttons["Cancel"]
+        
+        XCTAssertTrue(appleMapsButton.exists, "Apple Maps button not found")
+        XCTAssertTrue(googleMapsButton.exists, "Google Maps button not found")
+        XCTAssertTrue(cancelButton.exists, "Cancel button not found")
+        
+        // Simulate tapping the "Apple Maps" button
+        appleMapsButton.tap()
+    }
+    
+    func testMapInteraction() throws {
+        let app = XCUIApplication()
+        app.launch() // Launch your app
+        
+        // Will fail because map view is hidden till an event is selected
+        let mapView = app.maps["MapView"]
+        XCTAssertTrue(mapView.waitForExistence(timeout: 10), "MKMapView not found")
+        
+        // Tap on the MKMapView to trigger the tap gesture
+        mapView.tap()
+        
+        // Wait for the alert controller to appear
+        let alert = app.alerts.element
+        XCTAssertTrue(alert.waitForExistence(timeout: 5), "Alert controller not displayed")
+        
+        // Verify the alert controller's buttons
+        let appleMapsButton = alert.buttons["Apple Maps"]
+        let googleMapsButton = alert.buttons["Google Maps"]
+        let cancelButton = alert.buttons["Cancel"]
+        
+        XCTAssertTrue(appleMapsButton.exists, "Apple Maps button not found")
+        XCTAssertTrue(googleMapsButton.exists, "Google Maps button not found")
+        XCTAssertTrue(cancelButton.exists, "Cancel button not found")
+        
+        // Simulate tapping the "Apple Maps" button
+        appleMapsButton.tap()
+    }
 }

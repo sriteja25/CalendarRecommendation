@@ -42,6 +42,38 @@ final class CalenderReceommendationsTests: XCTestCase {
         wait(for: [expectation], timeout: 10.0)
     }
     
+    func testCalculateHoursAndMinutes() {
+        // Test case 1: Calculate hours and minutes between two valid dates
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+        if let startDate = dateFormatter.date(from: "2023-10-13 10:00:00"),
+           let endDate = dateFormatter.date(from: "2023-10-13 14:30:00") {
+            let result = Reusable().calculateHoursAndMinutes(startDate: startDate, endDate: endDate)
+            XCTAssertEqual(result.hours, 4, "Hours should be 4")
+            XCTAssertEqual(result.minutes, 30, "Minutes should be 30")
+        } else {
+            XCTFail("Failed to create valid dates for test case 1")
+        }
+        
+        // Test case 2: Calculate hours and minutes when start date is nil
+        let endDate = dateFormatter.date(from: "2023-10-13 14:30:00")!
+        let result2 = Reusable().calculateHoursAndMinutes(startDate: nil, endDate: endDate)
+        XCTAssertEqual(result2.hours, 0, "Hours should be 0 when start date is nil")
+        XCTAssertEqual(result2.minutes, 0, "Minutes should be 0 when start date is nil")
+        
+        // Test case 3: Calculate hours and minutes when end date is nil
+        let startDate = dateFormatter.date(from: "2023-10-13 10:00:00")!
+        let result3 = Reusable().calculateHoursAndMinutes(startDate: startDate, endDate: nil)
+        XCTAssertEqual(result3.hours, 0, "Hours should be 0 when end date is nil")
+        XCTAssertEqual(result3.minutes, 0, "Minutes should be 0 when end date is nil")
+        
+        // Test case 4: Calculate hours and minutes when both dates are nil
+        let result4 = Reusable().calculateHoursAndMinutes(startDate: nil, endDate: nil)
+        XCTAssertEqual(result4.hours, 0, "Hours should be 0 when both dates are nil")
+        XCTAssertEqual(result4.minutes, 0, "Minutes should be 0 when both dates are nil")
+    }
+    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {

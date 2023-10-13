@@ -163,7 +163,7 @@ class EventDetailsViewController: UIViewController {
         self.view.addSubview(self.gptValue)
         self.gptValue.topToBottom(of: self.gptLabel, offset: 5)
         self.gptValue.widthToSuperview(multiplier: 0.9)
-        self.gptValue.height(250)
+        self.gptValue.height(200)
         self.gptValue.centerXToSuperview()
         
         self.setValues()
@@ -171,7 +171,7 @@ class EventDetailsViewController: UIViewController {
     // MARK: - Setup Values for the Event
     func setValues() {
         
-        let timedifference = self.calculateHoursAndMinutes(startDate: event.startDate, endDate: event.endDate)
+        let timedifference = Reusable().calculateHoursAndMinutes(startDate: event.startDate, endDate: event.endDate)
         var time = "(\(timedifference.hours)h \(timedifference.minutes) min)"
         if timedifference.minutes == 0 {
             if timedifference.hours > 1 {
@@ -335,17 +335,6 @@ class EventDetailsViewController: UIViewController {
 }
 
 extension EventDetailsViewController {
-    
-    func calculateHoursAndMinutes(startDate: Date, endDate: Date) -> (hours: Int, minutes: Int) {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: startDate, to: endDate)
-        
-        if let hours = components.hour, let minutes = components.minute {
-            return (hours, minutes)
-        } else {
-            return (0, 0)
-        }
-    }
     
     func attributedText(mainText: String, eventName: String, timeDiff: String) -> NSMutableAttributedString {
         
