@@ -89,7 +89,7 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    // MARK: Event Editing
+    // MARK: Add new event
     
     override func dayView(dayView: DayView, didLongPressTimelineAt date: Date) {
         // Cancel editing current event and start creating a new one

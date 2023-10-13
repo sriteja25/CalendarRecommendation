@@ -56,6 +56,7 @@ class EventDetailsViewController: UIViewController {
         let mapView = MKMapView(frame: .zero)
         mapView.mapType = .standard
         mapView.showsUserLocation = true
+        mapView.accessibilityIdentifier = "MapView"
         return mapView
     }()
     
@@ -108,7 +109,7 @@ class EventDetailsViewController: UIViewController {
         title = "🗓️ Event details"
     }
     
-    // MARK: - Setup Navigation
+    // MARK: - Setup UI
     
     private func setupUI() {
         self.view.backgroundColor = .white
@@ -167,7 +168,7 @@ class EventDetailsViewController: UIViewController {
         
         self.setValues()
     }
-    
+    // MARK: - Setup Values for the Event
     func setValues() {
         
         let timedifference = self.calculateHoursAndMinutes(startDate: event.startDate, endDate: event.endDate)
@@ -193,7 +194,7 @@ class EventDetailsViewController: UIViewController {
         
         self.getWeather()
     }
-    
+    // MARK: - Get Weather for the event location
     func getWeather() {
         if let lat = event.structuredLocation?.geoLocation?.coordinate.latitude, let lon = event.structuredLocation?.geoLocation?.coordinate.longitude  {
             self.reverseGeocoding(lat: lat, lon: lon)
@@ -205,7 +206,7 @@ class EventDetailsViewController: UIViewController {
             locationManager.requestLocation()
         }
     }
-    
+    // MARK: - Show event location on a map
     func showMap(lat: Double, lon: Double) {
         DispatchQueue.main.async {
             self.lat = lat
@@ -214,8 +215,8 @@ class EventDetailsViewController: UIViewController {
             LocationManager().loadPlaceOnMap(latitude: lat, longitude: lon, title: placeTitle, subtitle: "", mapView: self.mapView)
         }
     }
-    
-    @objc 
+    // MARK: - Redirect to map
+    @objc
     func handleTap(_ gesture: UITapGestureRecognizer) {
         
         let placeTitle = self.event.title ?? "Event place"
@@ -232,7 +233,7 @@ class EventDetailsViewController: UIViewController {
         }))
         self.navigationController?.present(controller, animated: true)
     }
-    
+    // MARK: - Fetch hourly weather
     func fetchWeather(lat: Double, lon: Double) {
         self.showMap(lat: lat, lon: lon)
         let weatherService = WeatherService()
@@ -260,7 +261,7 @@ class EventDetailsViewController: UIViewController {
         
         
     }
-    
+    // MARK: - Get address from event location
     func reverseGeocoding (lat: Double, lon: Double) {
         
         let locationManager = LocationManager()
@@ -280,7 +281,7 @@ class EventDetailsViewController: UIViewController {
             }
         }
     }
-    
+    // MARK: - Get Event specific recommendations
     func gptRecommendation(startWeather: HourlyData, endWeather: HourlyData) {
         
         DispatchQueue.main.async {
@@ -312,7 +313,7 @@ class EventDetailsViewController: UIViewController {
             self.hud.hide(animated: true)
         }
     }
-    
+    // MARK: - Delete event
     @objc
     func deleteTapped() {
         let delete = UIAlertAction(title: "Delete", style: .destructive) { _ in
