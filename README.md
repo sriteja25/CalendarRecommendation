@@ -15,3 +15,6 @@ Download My Calendar Recommendation now and experience a smarter way to plan you
 * Start time and end time displayed
 
 ## Demo
+
+![ezgif-5-8abb605c78|320x271](https://github.com/sriteja25/CalendarRecommendation/assets/12974407/20c4745e-64af-4096-8b78-13787386c6d9)
+
