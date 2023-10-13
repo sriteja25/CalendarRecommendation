@@ -20,19 +20,13 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
         self.view.backgroundColor = .white
         // The app must have access to the user's calendar to show the events on the timeline
         requestAccessToCalendar()
-        // Subscribe to notifications to reload the UI when
+        // Subscribe to notifications to reload the UI when store has an event update
         subscribeToNotifications()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // Need to set toolbar hidden, as it might be displayed in black due to EventKitUI / EditingViewController setting it
-        navigationController?.setToolbarHidden(true, animated: false)
     }
     
     private func requestAccessToCalendar() {
         // Request access to the events
-        eventStore.requestAccess(to: .event) { [weak self] granted, error in
+        eventStore.requestFullAccessToEvents { [weak self] granted, error in
             // Handle the response to the request.
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -81,8 +75,6 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
     
     // MARK: - DayViewDelegate
     
-    // MARK: Event Selection
-    
     override func dayViewDidSelectEventView(_ eventView: EventView) {
         guard let ckEvent = eventView.descriptor as? EventWrapper else {
             return
@@ -90,15 +82,11 @@ final class HomeViewController: DayViewController, EKEventEditViewDelegate {
         presentDetailViewForEvent(ckEvent.ekEvent)
     }
     
+    // MARK: Event Selection
+    
     private func presentDetailViewForEvent(_ ekEvent: EKEvent) {
         let vc = EventDetailsViewController(event: ekEvent, eventStore: eventStore)
         navigationController?.pushViewController(vc, animated: true)
-//        let eventController = EKEventViewController()
-//        eventController.event = ekEvent
-//        eventController.allowsCalendarPreview = true
-//        eventController.allowsEditing = true
-//        navigationController?.pushViewController(eventController,
-//                                                 animated: true)
     }
     
     // MARK: Event Editing

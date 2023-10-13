@@ -7,6 +7,7 @@
 
 import EventKit
 import EventKitUI
+import MBProgressHUD
 import TinyConstraints
 import UIKit
 
@@ -14,9 +15,9 @@ class EventDetailsViewController: UIViewController {
     
     private let header: UILabel = {
         let label = UILabel(frame: .zero)
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.font = UIFont.boldSystemFont(ofSize: 22)
         label.numberOfLines = 0
-        label.textAlignment = .left
+        label.textAlignment = .right
         return label
     }()
     
@@ -24,7 +25,7 @@ class EventDetailsViewController: UIViewController {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .left
-        label.text = "Start Time: "
+        label.text = "🕒 Start Time: "
         return label
     }()
     
@@ -39,7 +40,7 @@ class EventDetailsViewController: UIViewController {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .left
-        label.text = "End Time: "
+        label.text = "🕞 End Time: "
         return label
     }()
     
@@ -52,17 +53,17 @@ class EventDetailsViewController: UIViewController {
     
     private let deleteButton: UIButton = {
         let button = UIButton(frame: .zero)
-        button.setTitle("Delete Event", for: .normal)
+        button.setTitle("🗑️ Delete Event", for: .normal)
         button.setTitleColor(.red, for: .normal)
         return button
     }()
     
     private let gptLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.font = UIFont.boldSystemFont(ofSize: 16)
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.text = "Based on weather and location"
+        label.text = "🙌 Recommendations"
         return label
     }()
     
@@ -71,12 +72,14 @@ class EventDetailsViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13)
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.contentMode = .top
         return label
     }()
     
     private let event: EKEvent
     private let eventStore: EKEventStore
     private var locationName: String = ""
+    private var hud = MBProgressHUD()
     
     required init(event: EKEvent, eventStore: EKEventStore) {
         self.event = event
@@ -92,7 +95,7 @@ class EventDetailsViewController: UIViewController {
         super.viewDidLoad()
         
         self.setupUI()
-        title = "Event details"
+        title = "🗓️ Event details"
     }
     
     // MARK: - Setup Navigation
@@ -109,8 +112,8 @@ class EventDetailsViewController: UIViewController {
         self.view.addSubview(endDateLabel)
         startDateLabel.topToBottom(of: header, offset: 30)
         endDateLabel.topToBottom(of: startDateLabel, offset: 30)
-        startDateLabel.width(75)
-        endDateLabel.width(75)
+        startDateLabel.width(100)
+        endDateLabel.width(100)
         startDateLabel.height(20)
         endDateLabel.height(20)
         startDateLabel.leftToSuperview(offset: 35)
@@ -124,14 +127,26 @@ class EventDetailsViewController: UIViewController {
         endDate.width(75)
         startDate.height(20)
         endDate.height(20)
-        startDate.leftToRight(of: startDateLabel, offset: 10)
-        endDate.leftToRight(of: endDateLabel, offset: 10)
+        startDate.leftToRight(of: startDateLabel, offset: 2)
+        endDate.leftToRight(of: endDateLabel, offset: 2)
         
         self.view.addSubview(deleteButton)
         deleteButton.bottomToSuperview(offset: -30)
         deleteButton.widthToSuperview()
         deleteButton.height(40)
         deleteButton.addTarget(self, action: #selector(deleteTapped), for: .touchUpInside)
+        
+        self.view.addSubview(self.gptLabel)
+        self.gptLabel.topToBottom(of: self.endDateLabel, offset: 45)
+        self.gptLabel.widthToSuperview(multiplier: 0.9)
+        self.gptLabel.height(20)
+        self.gptLabel.centerXToSuperview()
+        self.view.addSubview(self.gptValue)
+        self.gptValue.topToBottom(of: self.gptLabel, offset: 5)
+        self.gptValue.widthToSuperview(multiplier: 0.9)
+        self.gptValue.height(250)
+        self.gptValue.centerXToSuperview()
+        
         self.setValues()
     }
     
@@ -140,9 +155,18 @@ class EventDetailsViewController: UIViewController {
         let timedifference = self.calculateHoursAndMinutes(startDate: event.startDate, endDate: event.endDate)
         var time = "(\(timedifference.hours)h \(timedifference.minutes) min)"
         if timedifference.minutes == 0 {
-            time = "(\(timedifference.hours)hour)"
+            if timedifference.hours > 1 {
+                time = "(\(timedifference.hours) hours)"
+            } else {
+                time = "(\(timedifference.hours) hour)"
+            }
+            
         } else if timedifference.hours == 0 {
-            time = "(\(timedifference.minutes) min)"
+            if timedifference.minutes > 1 {
+                time = "(\(timedifference.minutes) mins)"
+            } else {
+                time = "(\(timedifference.minutes) min)"
+            }
         }
         
         header.attributedText = self.attributedText(mainText: event.title + time, eventName: event.title, timeDiff: time)
@@ -182,7 +206,10 @@ class EventDetailsViewController: UIViewController {
                 let end = weatherResponse.hourly[endIndex]
                 self.gptRecommendation(startWeather: start, endWeather: end)
             case .failure(let error):
+                // Failed to fetch data, update GPT with error message
                 print("Error: \(error)")
+                let response = "No recommendations available at this moment. Please try again after sometime or select another event from Calendar."
+                self.addGPTText(response: response)
             }
         }
         
@@ -203,6 +230,7 @@ class EventDetailsViewController: UIViewController {
                 self.locationName = "\(address) \(city) \(state) \(postalCode) \(country)"
                 self.fetchWeather(lat: lat, lon: lon)
             } else {
+                self.fetchWeather(lat: lat, lon: lon)
                 print("Reverse geocoding failed.")
             }
         }
@@ -210,12 +238,20 @@ class EventDetailsViewController: UIViewController {
     
     func gptRecommendation(startWeather: HourlyData, endWeather: HourlyData) {
         
+        DispatchQueue.main.async {
+            self.hud = MBProgressHUD.showAdded(to: self.gptValue, animated: true)
+            self.hud.mode = .indeterminate
+            self.hud.label.text = "Generating..."
+        }
+        
         let gpt = GPTService()
         gpt.getResponse(event: self.event, startWeather: startWeather, endWeather: endWeather, locationName: locationName) { response, error in
+            
             if error != nil {
-                print(error?.localizedDescription)
+                print(error?.localizedDescription as Any)
+                let response = "No recommendations available at this moment. Please try again after sometime or select another event from Calendar."
+                self.addGPTText(response: response)
             } else {
-                print(response)
                 guard let response = response else {
                     return
                 }
@@ -227,17 +263,8 @@ class EventDetailsViewController: UIViewController {
     func addGPTText(response: String) {
         
         DispatchQueue.main.async {
-            self.view.addSubview(self.gptLabel)
-            self.gptLabel.topToBottom(of: self.endDateLabel, offset: 30)
-            self.gptLabel.widthToSuperview(multiplier: 0.9)
-            self.gptLabel.height(40)
-            self.gptLabel.centerXToSuperview()
-            self.view.addSubview(self.gptValue)
-            self.gptValue.topToBottom(of: self.gptLabel, offset: 15)
-            self.gptValue.widthToSuperview(multiplier: 0.9)
-            self.gptValue.height(300)
-            self.gptValue.centerXToSuperview()
             self.gptValue.text = response
+            self.hud.hide(animated: true)
         }
     }
     
@@ -251,7 +278,7 @@ class EventDetailsViewController: UIViewController {
                 
             } catch {
                 print("Error deleting event: \(error.localizedDescription)")
-                AlertManager.showAlertWithActions(title: "Error", message: error.localizedDescription, viewController: self, actions: [UIAlertAction(title: "Ok", style: .cancel)], completion: nil)
+                AlertManager.showAlert(title: "Error", message: error.localizedDescription, viewController: self)
                 // Show Alert of failed event deletion
             }
         }
