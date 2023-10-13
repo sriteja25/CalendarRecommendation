@@ -268,11 +268,6 @@ class EventDetailsViewController: UIViewController {
         
         locationManager.reverseGeocode(latitude: lat, longitude: lon) { address, city, state, postalCode, country in
             if let address = address, let city = city, let state = state, let postalCode = postalCode, let country = country {
-                print("Address: \(address)")
-                print("City: \(city)")
-                print("State: \(state)")
-                print("Postal Code: \(postalCode)")
-                print("Country: \(country)")
                 self.locationName = "\(address) \(city) \(state) \(postalCode) \(country)"
                 self.fetchWeather(lat: lat, lon: lon)
             } else {

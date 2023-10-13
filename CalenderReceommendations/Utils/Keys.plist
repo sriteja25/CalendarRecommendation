@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>GPT_KEY</key>
+	<string>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</string>
+	<key>OpenWeatherMap_Key</key>
+	<string>10d83272107b3579bbec3790805f50f1</string>
+</dict>
+</plist>
