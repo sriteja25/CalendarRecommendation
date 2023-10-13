@@ -150,7 +150,7 @@ class EventDetailsViewController: UIViewController {
         self.view.addSubview(mapView)
         mapView.height(75)
         mapView.widthToSuperview()
-        mapView.bottomToTop(of: deleteButton, offset: -20)
+        mapView.bottomToTop(of: deleteButton, offset: -30)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         mapView.addGestureRecognizer(tapGesture)
@@ -163,7 +163,7 @@ class EventDetailsViewController: UIViewController {
         self.view.addSubview(self.gptValue)
         self.gptValue.topToBottom(of: self.gptLabel, offset: 5)
         self.gptValue.widthToSuperview(multiplier: 0.9)
-        self.gptValue.height(200)
+        self.gptValue.height(250)
         self.gptValue.centerXToSuperview()
         
         self.setValues()
