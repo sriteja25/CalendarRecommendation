@@ -28,7 +28,7 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-Utils/Keys.plist
+/Utils/Keys.plist
 
 ## Obj-C/Swift specific
 *.hmap
