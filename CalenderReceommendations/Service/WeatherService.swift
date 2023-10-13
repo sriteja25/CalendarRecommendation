@@ -17,7 +17,6 @@ class WeatherService {
         if let path = Bundle.main.path(forResource: "Keys", ofType: "plist"),
            let keys = NSDictionary(contentsOfFile: path) as? [String: String] {
             if let apiKey = keys["OpenWeatherMap_Key"] {
-                // Use apiKey1 for your API calls
                 let apiKey = apiKey
                 let urlString = "\(baseURL)?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)&units=\(units)"
                 
